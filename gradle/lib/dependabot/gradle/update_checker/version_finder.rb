@@ -162,6 +162,10 @@ module Dependabot
 
         def dependency_metadata(repository_details)
           @dependency_metadata ||= {}
+
+          # TODO: debug log
+          puts "[VersionFinder#dependency_metadata] repository_details: #{repository_details}"
+
           @dependency_metadata[repository_details.hash] ||=
             begin
               response = Dependabot::RegistryClient.get(
@@ -185,9 +189,16 @@ module Dependabot
         end
 
         def check_response(response, repository_url)
+          # TODO: debug log
+          puts "[VersionFinder#check_response] repository_url: #{repository_url}, response.status: #{response.status}"
+
           return unless response.status == 401 || response.status == 403
           return if @forbidden_urls.include?(repository_url)
           return if central_repo_urls.include?(repository_url)
+
+          # TODO: debug log
+          # https://github.com/excon/excon/blob/v0.93.1/lib/excon/response.rb#L223-L225
+          response.pp
 
           @forbidden_urls << repository_url
         end
